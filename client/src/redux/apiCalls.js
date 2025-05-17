@@ -1,4 +1,5 @@
 import { loginFailure, loginStart, loginSuccess } from "./userRedux";
+import { publicRequest } from "../requestMethod";
 
 export const login = async (dispatch, user) => {
   dispatch(loginStart());
@@ -111,93 +112,7 @@ export const login = async (dispatch, user) => {
   }
 };
 
-// export const login = async (dispatch, user) => {
-//     dispatch(loginStart());
-//     try {
-//         const res = await publicRequest.post("/users/login", user);
-//         const loggedInUser = res.data;
-//         dispatch(loginSuccess(loggedInUser));
 
-//         // Get cart from DB
-//         const dbCartRes = await publicRequest.get(`/cart/${loggedInUser._id}`);
-//         const dbCart = dbCartRes.data;
-
-//         // Merge with localStorage cart
-//         const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-//         const mergedCart = [...dbCart.products];
-
-//         localCart.forEach(localItem => {
-//             const exists = mergedCart.find(dbItem => dbItem._id === localItem._id);
-//             if (!exists) mergedCart.push(localItem);
-//         });
-
-//         // Update cart in Redux and clear localStorage
-//         dispatch(setCart({ products: mergedCart, total: dbCart.total }));
-//         localStorage.removeItem("cart");
-
-//     } catch (err) {
-//         dispatch(loginFailure());
-//         console.error("Login failed:", err);
-//     }
-// };
-
-
-// import { loginFailure, loginStart, loginSuccess } from "./userRedux";
-// import { addProduct } from "./cartRedux";
-// import { publicRequest } from "../requestMethod";
-
-// export const login = async (dispatch, user) => {
-//   dispatch(loginStart());
-//   try {
-//     const res = await publicRequest.post("/users/login", user);
-//     const loggedInUser = res.data;
-//     dispatch(loginSuccess(loggedInUser));
-
-//     // STEP 1: Get cart from DB
-//     const dbCartRes = await publicRequest.get(`/cart/${loggedInUser._id}`);
-//     const dbCart = dbCartRes.data;
-
-//     // STEP 2: Merge localStorage cart with DB cart
-//     const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-
-//     const mergedCart = [...dbCart.products];
-
-//     // Add any product in localCart that's not already in dbCart
-//     localCart.forEach(localItem => {
-//       const exists = mergedCart.find(dbItem => dbItem._id === localItem._id);
-//       if (!exists) mergedCart.push(localItem);
-//     });
-
-//     // STEP 3: Dispatch merged cart to Redux
-//     dispatch(setCart({ products: mergedCart, total: dbCart.total }));
-
-//     // STEP 4 (Optional): Clear localStorage cart now that it's merged
-//     localStorage.removeItem("cart");
-
-//   } catch (err) {
-//     dispatch(loginFailure());
-//     console.error("Login failed:", err);
-//   }
-// };
-
-// export const login = async (dispatch, user) => {
-//   dispatch(loginStart());
-//   try {
-//     const res = await publicRequest.post("/users/login", user);
-//     dispatch(loginSuccess(res.data));
-
-//     // Get stored cart items from localStorage (if any)
-//     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-
-//     // Dispatch each cart item to Redux
-//     storedCart.forEach(product => {
-//       dispatch(addProduct(product));
-//     });
-
-//   } catch (err) {
-//     dispatch(loginFailure());
-//   }
-// };
 
 
 // import { publicRequest } from "../requestMethod";
