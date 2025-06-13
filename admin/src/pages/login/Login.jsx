@@ -3,8 +3,8 @@ import { useDispatch } from "react-redux";
 import { login } from "../../redux/apiCalls";
 
 const Login = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
     const dispatch = useDispatch();
 
 
@@ -14,10 +14,25 @@ const Login = () => {
     }
 
     return (
-        <div>
-            <input type="text" placeholder="Username" onChange={e=>setUsername(e.target.value)} />
-            <input type="password" placeholder="Password" onChange={e=>setPassword(e.target.value)} />
-            <button onClick={handleClick}>Login</button>
+        <div style={{ 
+                height: "100vh", 
+                display: "flex", 
+                flexDirection: "column",
+                alignItems: "center", 
+                justifyContent: "center"
+            }}
+        >
+            <input style={{ padding: 10, marginBottom: 20 }}
+                type="text" 
+                placeholder="Username" 
+                onChange={e=>setUsername(e.target.value)} 
+            />
+            <input style={{ padding: 10, marginBottom: 20 }}
+                type="password" 
+                placeholder="Password" 
+                onChange={e=>setPassword(e.target.value)}
+            />
+            <button onClick={handleClick} style={{ padding: 10, width: 100 }}>Login</button>
         </div>
     )
 }

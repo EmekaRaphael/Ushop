@@ -1,26 +1,63 @@
 import { Router } from "express";
-import { restrictTo, protect} from "../controllers/authController.js";
-import { createProduct, updateProduct, deleteProduct } from "../controllers/productController.js";
+import { verifyTokenAndAdmin } from "./verifyToken.js";
 import { Product } from "../models/productModel.js";
 
 
 const router = Router();
 
-// ✅ Get a product by ID
-router.get("/find/:id", async (req, res) => {
+//CREATE
+router.post("/", verifyTokenAndAdmin, async (req, res) =>{
+    const newProduct = new Product(req.body);
+
     try {
-        const product = await Product.findById(req.params.id);
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" });
-        }
-        res.status(200).json(product);
+        const savedProduct = await newProduct.save();
+        res.status(200).json(savedProduct);
     } catch (err) {
-        res.status(500).json({ message: "Server error" });
-        console.log(err);
+        res.status(500).json(err);
     }
 });
 
-// GET ALL PRODUCTS
+//UPDATE
+router.put("/:id", verifyTokenAndAdmin, async (req, res) => {
+
+    try {
+        const updatedProduct = await Product.findByIdAndUpdate(
+            req.params.id, 
+            {
+                $set: req.body
+            }, 
+            {
+                new: true
+            }
+        );
+
+        res.status(200).json(updatedProduct);
+    } catch(err) {
+        res.status(500).json(err);
+    }
+});
+
+// //DELETE
+router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
+    try {
+        await Product.findByIdAndDelete(req.params.id);
+        res.status(200).json("Product has been deleted...");
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+// //GET PRODUCT
+router.get("/find/:id", async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        return res.status(200).json(product);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+//GET ALL PRODUCTS
 router.get("/", async (req, res) => {
     const qNew = req.query.new;
     const qCategory = req.query.category;
@@ -29,7 +66,7 @@ router.get("/", async (req, res) => {
         let products;
 
         if(qNew) {
-            products = await Product.find().sort({createdAt: -1}).limit(1);
+            products = await Product.find().sort({ createdAt: -1 }).limit(5);
         } else if(qCategory) {
             products = await Product.find({
                 categories: {
@@ -46,17 +83,5 @@ router.get("/", async (req, res) => {
         console.log(err);
     }
 });
-
-// Routes
-router
-    .route("/")
-    .post(protect, restrictTo("admin"), createProduct);
-
-router
-    .route("/:id")
-    .patch(protect, restrictTo("admin"), updateProduct)
-    .delete(protect, restrictTo("admin"), deleteProduct);
-
-
 
 export {router};

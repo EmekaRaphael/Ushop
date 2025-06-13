@@ -1,6 +1,20 @@
 import "./widgetLg.css";
+// import { useState, useEffect } from "react";
 
 export default function WidgetLg() {
+
+    // const [Orders, setOrders] = useState([]);
+  
+    // useEffect(() => {
+    //   const getUsers = async () => {
+    //     try {
+    //       const res = await userRequest.get("users/?new=true");
+    //       setOrders(res.data);
+    //     } catch {}
+    //   };
+    //   getUsers();
+    // }, []);
+
   const Button = ({ type }) => {
     return <button className={"widgetLgButton " + type}>{type}</button>;
   };

@@ -1,53 +1,99 @@
 import { Router } from "express";
-import { uploadUserPhoto, resizeUserPhoto, getAllUsers, getMe, updateMe, deleteMe, getUser, updateUser, deleteUser} from "../controllers/userController.js";
-import { signUp, login, logout, protect, forgotPassword, resetPassword, updatePassword, restrictTo} from "../controllers/authController.js";
+import { verifyTokenAndAuthorization, verifyTokenAndAdmin } from "./verifyToken.js";
+import { User } from "../models/userModel.js";
 
 const router = Router();
 
-router.post("/signup", signUp);
-router.post("/login", login);
-router.post("/logout", logout);
+//UPDATE
+router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
+    if(req.body.password) {
+        req.body.password = CryptoJS.AES.encrypt(
+            req.body.password, 
+            process.env.JWT_SEC
+        ).toString()
+    }
 
-router.post("/forgotPassword", forgotPassword);
-router.patch("/resetPassword/:token", resetPassword);
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id, 
+            {
+                $set: req.body
+            }, 
+            {
+                new: true
+            }
+        );
 
-// Protects all routes after this middleware
-router.use(protect);
+        res.status(200).json(updatedUser);
+    } catch(err) {
+        res.status(500).json(err);
+    }
+});
 
-router
-    .patch(
-        "/updateMyPassword", 
-        updatePassword
-    );
+//DELETE
+router.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
+    try {
+        await User.findByIdAndDelete(req.params.id);
+        res.status(200).json("User has been deleted...");
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
-router
-    .get(
-        "/me",
-        getMe, 
-        getUser
-    );
+//GET USER
+router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        const { password, ...others } = user._doc;
+        return res.status(200).json(others);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
-router
-    .patch(
-        "/updateMe", 
-        uploadUserPhoto,
-        resizeUserPhoto,
-        updateMe
-    );
+//GET ALL USERS
+router.get("/", verifyTokenAndAdmin, async (req, res) => {
+    const query = req.query.new;
+    try {
+        const users = query 
+            ? await User.find().sort({ _id: -1 }).limit(5) 
+            : await User.find();
+        return res.status(200).json(users);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
-router.delete("/deleteMe", deleteMe);
+//GET STATS
+router.get("/stats", verifyTokenAndAdmin, async (req, res) => {
+    const date = new Date();
+    const lastYear = new Date(date.setFullYear(date.getFullYear() - 1 ));
 
-router.use(restrictTo("admin"));
+    try {
 
-router
-    .route("/")
-    .get(getAllUsers);
-
-router
-    .route("/:id")
-    .get(getUser)
-    .patch(updateUser)
-    .delete(deleteUser);
-
+        const data = await User.aggregate([
+            { 
+                $match: { 
+                    createdAt: { $gte: lastYear } 
+                } 
+            },
+            {
+                $project: {
+                    month: { $month: "$createdAt" },
+                },
+            },
+            {
+                $group: {
+                    _id: "$month",
+                    total: { $sum: 1 },
+                }
+            }
+        ]);
+    
+    res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
 export {router};
