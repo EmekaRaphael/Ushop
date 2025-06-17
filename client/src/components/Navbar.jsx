@@ -9,7 +9,7 @@ import { logout } from "../redux/userRedux.js"
 // import { emptyCart } from "../redux/cartRedux.js";
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { publicRequest } from '../requestMethod.js'
+// import { publicRequest } from '../requestMethod.js'
 
 
 const Container = styled.div`
@@ -133,28 +133,21 @@ const Navbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleLogout = async () => {
+    const handleLogout = () => {
         try {
-          // Call the API to clear the session on the server side
-          await publicRequest.post("/users/logout");
-      
-          // Remove the token from localStorage
-          localStorage.removeItem("jwtToken");
+            // Remove Redux-persisted user state from localStorage
+            localStorage.removeItem("persist:root");
 
-          // Dispatch logout action in redux to update the user state
-          dispatch(logout());
+            // Dispatch logout action to clear Redux state
+            dispatch(logout());
 
-          // Dispatch removeItem action to empty the cart
-        //   dispatch(emptyCart()); // clears redux state
-        //   localStorage.removeItem('cart');
-      
-          // Optionally, close the menu if open
-          setMenuOpen(false);
-      
-          // Optionally, redirect the user to the homepage
-          navigate('/');
+            // Optional: Close the mobile menu
+            setMenuOpen(false);
+
+            // Optional: Redirect to homepage
+            navigate('/');
         } catch (err) {
-          console.error("Error logging out from API:", err);
+            console.error("Local logout failed:", err);
         }
     };
 
@@ -268,3 +261,28 @@ const Navbar = () => {
 };
 
 export default Navbar
+
+    // const handleLogout = async () => {
+    //     try {
+    //       // Call the API to clear the session on the server side
+    //       await publicRequest.post("/users/logout");
+      
+    //       // Remove the token from localStorage
+    //       localStorage.removeItem("jwtToken");
+
+    //       // Dispatch logout action in redux to update the user state
+    //       dispatch(logout());
+
+    //       // Dispatch removeItem action to empty the cart
+    //     //   dispatch(emptyCart()); // clears redux state
+    //     //   localStorage.removeItem('cart');
+      
+    //       // Optionally, close the menu if open
+    //       setMenuOpen(false);
+      
+    //       // Optionally, redirect the user to the homepage
+    //       navigate('/');
+    //     } catch (err) {
+    //       console.error("Error logging out from API:", err);
+    //     }
+    // };

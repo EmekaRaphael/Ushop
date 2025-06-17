@@ -1,4 +1,21 @@
-import axios from "axios";
+// import axios from "axios";
+
+// const BASE_URL = "http://localhost:5000/api/";
+// const TOKEN = JSON.parse(JSON.parse(localStorage.getItem("persist:root")).user).currentUser.accessToken;
+
+// export const publicRequest = axios.create({
+//     baseURL: BASE_URL,
+// });
+
+// export const userRequest = axios.create({
+//     baseURL: BASE_URL,
+//     headers: {
+//         token: `Bearer ${TOKEN}`,
+//     },
+// });
+
+
+// import axios from "axios";
 
 // const BASE_URL = "http://localhost:5000/api/";
 // // const TOKEN = localStorage.getItem("jwtToken");
@@ -41,17 +58,42 @@ import axios from "axios";
 
 // import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/"
-const TOKEN = 
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NDI0MGM3OTExOTBiYzAzZDJhMjE2OCIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc0OTgyNzk4NiwiZXhwIjoxNzUwMDg3MTg2fQ.r6-A-6V8eemQr5XyQqaHWwUreh8yRgCuMaTTTzXuaP4"
+// const BASE_URL = "http://localhost:5000/api/"
+// const TOKEN = 
+//     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NDI0MGM3OTExOTBiYzAzZDJhMjE2OCIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc0OTgyNzk4NiwiZXhwIjoxNzUwMDg3MTg2fQ.r6-A-6V8eemQr5XyQqaHWwUreh8yRgCuMaTTTzXuaP4"
+
+// export const publicRequest = axios.create({
+//     baseURL: BASE_URL,
+// });
+
+// export const userRequest = axios.create({
+//     baseURL: BASE_URL,
+//     header: {
+//         token: `Bearer ${TOKEN}`
+//     },
+// });
+
+
+import axios from "axios";
+
+const BASE_URL = "http://localhost:5000/api/";
+
+let TOKEN = "";
+try {
+  const root = JSON.parse(localStorage.getItem("persist:root"));
+  const user = root?.user && JSON.parse(root.user);
+  TOKEN = user?.currentUser?.accessToken || "";
+} catch (err) {
+  console.warn("Unable to retrieve token from localStorage", err);
+}
 
 export const publicRequest = axios.create({
-    baseURL: BASE_URL,
+  baseURL: BASE_URL,
 });
 
 export const userRequest = axios.create({
-    baseURL: BASE_URL,
-    header: {
-        token: `Bearer ${TOKEN}`
-    },
+  baseURL: BASE_URL,
+  headers: {
+    Authorization: `Bearer ${TOKEN}`,
+  },
 });
