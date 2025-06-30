@@ -4,11 +4,12 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { router as authRoute } from "./routes/authRoute.js";
-import { router as userRoute } from './routes/userRoute.js';
+import { router as userRoute } from "./routes/userRoute.js";
 import { router as productRoute } from "./routes/productRoute.js";
 import { router as cartRoute } from "./routes/cartRoute.js";
 import { router as orderRoute } from "./routes/orderRoute.js";
-import { router as stripe } from './routes/stripe.js';
+import { router as stripe } from "./routes/stripe.js";
+import { router as uploadRoute } from "./routes/uploadRoute.js";
 
 
 const app = express();
@@ -33,6 +34,7 @@ app.use("/api/products", productRoute);
 app.use("/api/carts", cartRoute);
 app.use("/api/orders", orderRoute);
 app.use("/api/checkout", stripe);
+app.use("/api/upload", uploadRoute)
 
 app.listen(5000, () => {
     console.log("Server listening on port 5k");

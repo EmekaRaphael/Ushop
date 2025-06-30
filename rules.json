@@ -1,0 +1,13 @@
+[
+  {
+    "corsRuleName": "allow-frontend-uploads",
+    "allowedOrigins": [
+      "http://localhost:3000",
+      "http://localhost:5000"
+    ],
+    "allowedOperations": ["s3_put"],
+    "allowedHeaders": ["*"],
+    "exposeHeaders": ["etag"],
+    "maxAgeSeconds": 3600
+  }
+]
