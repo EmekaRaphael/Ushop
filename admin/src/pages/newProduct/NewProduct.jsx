@@ -60,9 +60,11 @@ export default function NewProduct() {
         body: file,
       });
 
+      const key = fileURL.split(`${process.env.B2_BUCKET_NAME}/`)[1];
+
       const product = {
         ...inputs,
-        img: fileURL,
+        img: key,
         categories: cat,
         inStock: inputs.inStock === "true"
       };
@@ -78,7 +80,6 @@ export default function NewProduct() {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="newProduct">

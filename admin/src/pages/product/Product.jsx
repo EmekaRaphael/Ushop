@@ -7,40 +7,56 @@ import { useEffect, useMemo, useState } from "react";
 import { userRequest } from "../../requestMethod";
 
 export default function Product() {
-    const location =  useLocation();
-    const productId = location.pathname.split("/")[2];
-    const [pStats, setPstats] = useState([]);
+  const location =  useLocation();
+  const productId = location.pathname.split("/")[2];
+  const [pStats, setPstats] = useState([]);
+  const [signedImageUrl, setSignedImageUrl] = useState("");
 
-    const product = useSelector((state) => 
-        state.product.products.find(product => product._id === productId)
-    );
+  const product = useSelector((state) => 
+      state.product.products.find(product => product._id === productId)
+  );
 
-    const MONTHS = useMemo (
-      () => [
-        "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
-      ],
-      []
-    );
+  const MONTHS = useMemo (
+    () => [
+      "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
+    ],
+    []
+  );
 
-    useEffect(() => {
-      const getStat = async () => {
-        try {
-          const res = await userRequest.get("/orders/income?pid=" + productId);
-          const list = res.data.sort((a, b) => {
-            return a._id - b._id
-          })
-          list.map(item => 
-            setPstats((prev) => [
-                ...prev,
-                { name: MONTHS[item._id - 1], Sales: item.total },
-            ])
-          );
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      getStat();
-    }, [productId, MONTHS]);
+  useEffect(() => {
+    const getStat = async () => {
+      try {
+        const res = await userRequest.get("/orders/income?pid=" + productId);
+        const list = res.data.sort((a, b) => {
+          return a._id - b._id
+        })
+        list.map(item => 
+          setPstats((prev) => [
+              ...prev,
+              { name: MONTHS[item._id - 1], Sales: item.total },
+          ])
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getStat();
+  }, [productId, MONTHS]);
+
+  useEffect(() => {
+    console.log("🔍 product.imgKey:", product?.imgKey); // Add this
+    const fetchSignedImage = async () => {
+      try {
+        if (!product?.imgKey) return;
+        const res = await userRequest.get(`/upload/signed-view-url?key=${product.imgKey}`);
+        setSignedImageUrl(res.data.signedGetURL);
+      } catch (err) {
+        console.error("❌ Failed to fetch signed image URL:", err);
+      }
+    };
+
+    fetchSignedImage();
+  }, [product]);
 
   return (
     <div className="product">
@@ -56,7 +72,7 @@ export default function Product() {
           </div>
           <div className="productTopRight">
               <div className="productInfoTop">
-                  <img src={product.img} 
+                  <img src={signedImageUrl} 
                     alt="" 
                     className="productInfoImg" 
                   />
@@ -96,7 +112,7 @@ export default function Product() {
               <div className="productFormRight">
                   <div className="productUpload">
                       <img 
-                         src={product.img} 
+                         src={signedImageUrl} 
                          alt="" 
                          className="productUploadImg"
                         />
